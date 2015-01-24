@@ -10,7 +10,8 @@
 -export([iterate/3, iterate/2,
          repeat/1, cycle/1, seq/2, seq/1, geometric_series/2,
          head/1, tail/1, ht/1,
-         take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2]).
+         take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
+         map/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -250,6 +251,24 @@ split(IL, 0, R) ->
     {lists:reverse(R), IL};
 split(IL, N, R) ->
     split(tail(IL), N - 1, [head(IL) | R]).
+
+%---------------------------------------------------------------------------------------------------
+% Zip/unzip functions and functors.
+%---------------------------------------------------------------------------------------------------
+
+-spec map(IL :: inflist(), Map_F :: fun((term()) -> term())) -> inflist().
+%% @doc
+%% Apply function to every element of infinite list.
+map(#inflist{h = H, acc = Acc, f = F}, Map_F) ->
+    iterate
+    (
+        Map_F(H),
+        {H, Acc},
+        fun(_, {Cur_H, Cur_Acc}) ->
+            {New_H, New_Acc} = F(Cur_H, Cur_Acc),
+            {Map_F(New_H), {New_H, New_Acc}}
+        end
+    ).
 
 %---------------------------------------------------------------------------------------------------
 

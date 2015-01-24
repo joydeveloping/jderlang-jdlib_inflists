@@ -13,7 +13,8 @@
 -import(jdlib_inflists,
         [repeat/1, cycle/1, seq/2, seq/1, geometric_series/2,
          head/1, tail/1, ht/1,
-         take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2]).
+         take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
+         map/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Tests.
@@ -79,6 +80,20 @@ take_drop_test() ->
     ?assertEqual(2, nth(IL2, 5)),
     ?assertMatch({[1, 2, 3, 1], _}, split(IL2, 4)),
     ?assertEqual([3, 1, 2], sublist(IL2, 3, 3)),
+    ok.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec map_test() -> ok.
+%% @doc
+%% Function map test.
+map_test() ->
+    IL1 = seq(1, 2),
+    IL2 = map(IL1, fun(E) -> E + 10 end),
+    ?assertEqual([11, 13, 15, 17, 19], take(IL2, 5)),
+    IL3 = geometric_series(1, 2),
+    IL4 = map(IL3, fun(E) -> E - 1 end),
+    ?assertEqual([3, 7, 15], sublist(IL4, 3, 3)),
     ok.
 
 %---------------------------------------------------------------------------------------------------
