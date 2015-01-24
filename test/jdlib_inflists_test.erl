@@ -15,7 +15,8 @@
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
-         map/2, adj_pairs_map/2]).
+         map/2, adj_pairs_map/2,
+         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Tests.
@@ -124,6 +125,30 @@ map_test() ->
     ?assertEqual([7, 9, 11], sublist(IL6, 3, 3)),
     IL7 = adj_pairs_map(IL5, fun(X, Y) -> Y - X end),
     ?assertEqual([1, 1, 1, 1, 1], sublist(IL7, 5, 5)),
+    ok.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec math_test() -> ok.
+%% @doc
+%% Function add, sub, mul, dvs, square, sqrt, pow.
+math_test() ->
+    IL1 = seq(2),
+    IL2 = geometric_series(2, 2),
+    ?assertEqual([4, 7, 12], take(add(IL1, IL2), 3)),
+    ?assertEqual([3, 4, 5], take(add(IL1, 1), 3)),
+    ?assertEqual([3, 5, 9], take(add(1, IL2), 3)),
+    ?assertThrow({badarg, _}, add(1, 2)),
+    ?assertEqual([0, -1, -4], take(sub(IL1, IL2), 3)),
+    ?assertEqual([-3, -2, -1], take(sub(IL1, 5), 3)),
+    ?assertEqual([1, -1, -5], take(sub(3, IL2), 3)),
+    ?assertThrow({badarg, _}, sub(1, 2)),
+    ?assertEqual([4, 12, 32], take(mul(IL1, IL2), 3)),
+    ?assertEqual([10, 15, 20], take(mul(IL1, 5), 3)),
+    ?assertEqual([6, 12, 24], take(mul(3, IL2), 3)),
+    ?assertThrow({badarg, _}, mul(1, 2)),
+    ?assertEqual([2.0, 3.0, 4.0], take(sqrt(square(IL1)), 3)),
+    ?assertEqual([1.0, 8.0, 27.0, 64.0, 125.0], take(pow(seq(1), 3), 5)),
     ok.
 
 %---------------------------------------------------------------------------------------------------

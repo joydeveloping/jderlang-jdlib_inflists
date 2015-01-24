@@ -12,7 +12,8 @@
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
-         map/2, adj_pairs_map/2]).
+         map/2, adj_pairs_map/2,
+         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -413,6 +414,112 @@ map(IL, Map_F) ->
 %% Apply map function to every pair of adjacent elements.
 adj_pairs_map(IL, Map_F) ->
     zipwith(IL, tail(IL), Map_F).
+
+%---------------------------------------------------------------------------------------------------
+% Mathematical functions.
+%---------------------------------------------------------------------------------------------------
+
+-spec add(Arg, Arg) -> inflist()
+      when Arg :: inflist() | term().
+%% @doc
+%% Add function.
+add(A, B) ->
+    Is_A = is_record(A, inflist),
+    Is_B = is_record(B, inflist),
+    if
+        Is_A andalso Is_B ->
+            zipwith(A, B, fun(X, Y) -> X + Y end);
+        Is_A ->
+            map(A, fun(X) -> X + B end);
+        Is_B ->
+            map(B, fun(X) -> X + A end);
+        true ->
+            throw({badarg, {A, B}})
+    end.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec sub(Arg, Arg) -> inflist()
+      when Arg :: inflist() | term().
+%% @doc
+%% Sub function.
+sub(A, B) ->
+    Is_A = is_record(A, inflist),
+    Is_B = is_record(B, inflist),
+    if
+        Is_A andalso Is_B ->
+            zipwith(A, B, fun(X, Y) -> X - Y end);
+        Is_A ->
+            map(A, fun(X) -> X - B end);
+        Is_B ->
+            map(B, fun(X) -> A - X end);
+        true ->
+            throw({badarg, {A, B}})
+    end.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec mul(Arg, Arg) -> inflist()
+      when Arg :: inflist() | term().
+%% @doc
+%% Multiplication.
+mul(A, B) ->
+    Is_A = is_record(A, inflist),
+    Is_B = is_record(B, inflist),
+    if
+        Is_A andalso Is_B ->
+            zipwith(A, B, fun(X, Y) -> X * Y end);
+        Is_A ->
+            map(A, fun(X) -> X * B end);
+        Is_B ->
+            map(B, fun(X) -> X * A end);
+        true ->
+            throw({badarg, {A, B}})
+    end.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec dvs(Arg, Arg) -> inflist()
+      when Arg :: inflist() | term().
+%% @doc
+%% Division.
+dvs(A, B) ->
+    Is_A = is_record(A, inflist),
+    Is_B = is_record(B, inflist),
+    if
+        Is_A andalso Is_B ->
+            zipwith(A, B, fun(X, Y) -> X / Y end);
+        Is_A ->
+            map(A, fun(X) -> X / B end);
+        Is_B ->
+            map(B, fun(X) -> A / X end);
+        true ->
+            throw({badarg, {A, B}})
+    end.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec square(IL :: inflist()) -> inflist().
+%% @doc
+%% Infinite list of squares.
+square(IL) ->
+    mul(IL, IL).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec sqrt(IL :: inflist()) -> inflist().
+%% @doc
+%% Square root of infinite list.
+sqrt(IL) ->
+    map(IL, fun(X) -> math:sqrt(X) end).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec pow(IL :: inflist(), P :: number()) -> inflist().
+%% @doc
+%% Power of infinite list.
+pow(IL, P) ->
+    map(IL, fun(X) -> math:pow(X, P) end).
 
 %---------------------------------------------------------------------------------------------------
 
