@@ -1,0 +1,18 @@
+{
+    application, jdlib_inflists,
+    [
+        {description, ""},
+        {vsn, "1"},
+        {registered, []},
+        {
+            applications,
+            [
+                kernel,
+                stdlib
+            ]
+        },
+        {mod, {jdlib_inflists_app, []}},
+        {env, []}
+    ]
+}.
+
