@@ -11,7 +11,8 @@
          repeat/1, cycle/1, seq/2, seq/1, geometric_series/2,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
-         map/2]).
+         zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
+         map/2, adj_pairs_map/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -256,10 +257,143 @@ split(IL, N, R) ->
 % Zip/unzip functions and functors.
 %---------------------------------------------------------------------------------------------------
 
+-spec zip(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
+%% @doc
+%% Zip two infinite lists.
+zip(#inflist{h = H1, acc = Acc1, f = F1}, #inflist{h = H2, acc = Acc2, f = F2}) ->
+    iterate
+    (
+        {H1, H2},
+        {Acc1, Acc2},
+        fun({Cur_H1, Cur_H2}, {Cur_Acc1, Cur_Acc2}) ->
+            {New_H1, New_Acc1} = F1(Cur_H1, Cur_Acc1),
+            {New_H2, New_Acc2} = F2(Cur_H2, Cur_Acc2),
+            {{New_H1, New_H2}, {New_Acc1, New_Acc2}}
+        end
+    );
+zip(IL1, IL2) ->
+    throw({badarg, {IL1, IL2}}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec zip_3(IL1 :: inflist(), IL2 :: inflist(), IL3 :: inflist()) -> inflist().
+%% @doc
+%% Zip three infinite lists.
+zip_3(#inflist{h = H1, acc = Acc1, f = F1},
+      #inflist{h = H2, acc = Acc2, f = F2},
+      #inflist{h = H3, acc = Acc3, f = F3}) ->
+    iterate
+    (
+        {H1, H2, H3},
+        {Acc1, Acc2, Acc3},
+        fun({Cur_H1, Cur_H2, Cur_H3}, {Cur_Acc1, Cur_Acc2, Cur_Acc3}) ->
+            {New_H1, New_Acc1} = F1(Cur_H1, Cur_Acc1),
+            {New_H2, New_Acc2} = F2(Cur_H2, Cur_Acc2),
+            {New_H3, New_Acc3} = F3(Cur_H3, Cur_Acc3),
+            {{New_H1, New_H2, New_H3}, {New_Acc1, New_Acc2, New_Acc3}}
+        end
+    );
+zip_3(IL1, IL2, IL3) ->
+    throw({badarg, {IL1, IL2, IL3}}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec zipwith(IL1 :: inflist(), IL2 :: inflist(), Zip_F) -> inflist()
+      when Zip_F :: fun((T1, T2) -> {T1, T2}),
+      T1 :: term(),
+      T2 :: term().
+%% @doc
+%% Zip two infinite lists with given function.
+zipwith(#inflist{h = H1, acc = Acc1, f = F1},
+        #inflist{h = H2, acc = Acc2, f = F2},
+        Zip_F) when is_function(Zip_F, 2) ->
+    iterate
+    (
+        Zip_F(H1, H2),
+        {{H1, Acc1}, {H2, Acc2}},
+        fun(_, {{Cur_H1, Cur_Acc1}, {Cur_H2, Cur_Acc2}}) ->
+            {New_H1, New_Acc1} = F1(Cur_H1, Cur_Acc1),
+            {New_H2, New_Acc2} = F2(Cur_H2, Cur_Acc2),
+            {Zip_F(New_H1, New_H2), {{New_H1, New_Acc1}, {New_H2, New_Acc2}}}
+        end
+    );
+zipwith(IL1, IL2, Zip_F) ->
+    throw({badarg, {IL1, IL2, Zip_F}}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec unzip(IL :: inflist()) -> {inflist(), inflist()}.
+%% @doc
+%% Unzip infinite list into two lists.
+unzip(#inflist{h = {H1, H2}, acc = {Acc1, Acc2}, f = F}) ->
+    {
+        iterate
+        (
+            H1,
+            Acc1,
+            fun(Cur_H1, Cur_Acc1) ->
+                {{New_H1, _}, {New_Acc1, _}} = F({Cur_H1, H2}, {Cur_Acc1, Acc2}),
+                {New_H1, New_Acc1}
+            end
+        ),
+        iterate
+        (
+            H2,
+            Acc2,
+            fun(Cur_H2, Cur_Acc2) ->
+                {{_, New_H2}, {_, New_Acc2}} = F({H1, Cur_H2}, {Acc1, Cur_Acc2}),
+                {New_H2, New_Acc2}
+            end
+        )
+    };
+unzip(IL) ->
+    throw({badarg, IL}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec unzip_3(IL :: inflist()) -> {inflist(), inflist(), inflist()}.
+%% @doc
+%% Unzip infinite list into three lists.
+unzip_3(#inflist{h = {H1, H2, H3}, acc = {Acc1, Acc2, Acc3}, f = F}) ->
+    {
+        iterate
+        (
+            H1,
+            Acc1,
+            fun(Cur_H1, Cur_Acc1) ->
+                {{New_H1, _, _}, {New_Acc1, _, _}} = F({Cur_H1, H2, H3}, {Cur_Acc1, Acc2, Acc3}),
+                {New_H1, New_Acc1}
+            end
+        ),
+        iterate
+        (
+            H2,
+            Acc2,
+            fun(Cur_H2, Cur_Acc2) ->
+                {{_, New_H2, _}, {_, New_Acc2, _}} = F({H1, Cur_H2, H3}, {Acc1, Cur_Acc2, Acc3}),
+                {New_H2, New_Acc2}
+            end
+        ),
+        iterate
+        (
+            H3,
+            Acc3,
+            fun(Cur_H3, Cur_Acc3) ->
+                {{_, _, New_H3}, {_, _, New_Acc3}} = F({H1, H2, Cur_H3}, {Acc1, Acc2, Cur_Acc3}),
+                {New_H3, New_Acc3}
+            end
+        )
+    };
+unzip_3(IL) ->
+    throw({badarg, IL}).
+
+%---------------------------------------------------------------------------------------------------
+
+
 -spec map(IL :: inflist(), Map_F :: fun((term()) -> term())) -> inflist().
 %% @doc
 %% Apply function to every element of infinite list.
-map(#inflist{h = H, acc = Acc, f = F}, Map_F) ->
+map(#inflist{h = H, acc = Acc, f = F}, Map_F) when is_function(Map_F, 1) ->
     iterate
     (
         Map_F(H),
@@ -268,7 +402,17 @@ map(#inflist{h = H, acc = Acc, f = F}, Map_F) ->
             {New_H, New_Acc} = F(Cur_H, Cur_Acc),
             {Map_F(New_H), {New_H, New_Acc}}
         end
-    ).
+    );
+map(IL, Map_F) ->
+    throw({badarg, {IL, Map_F}}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec adj_pairs_map(IL :: inflist(), Map_F :: fun((term(), term()) -> term())) -> inflist().
+%% @doc
+%% Apply map function to every pair of adjacent elements.
+adj_pairs_map(IL, Map_F) ->
+    zipwith(IL, tail(IL), Map_F).
 
 %---------------------------------------------------------------------------------------------------
 
