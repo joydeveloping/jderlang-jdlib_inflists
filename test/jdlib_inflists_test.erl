@@ -12,8 +12,8 @@
 % Functions import.
 -import(jdlib_inflists,
         [repeat/1, cycle/1, seq/2, seq/1, geometric_series/2,
-         head/1, tail/1,
-         take/2, drop/2]).
+         head/1, tail/1, ht/1,
+         take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Tests.
@@ -75,6 +75,10 @@ take_drop_test() ->
     IL2 = cycle([1, 2, 3]),
     ?assertEqual([a, a, a, a, a], take(drop(IL1, 5), 5)),
     ?assertEqual([3, 1, 2, 3, 1], take(drop(IL2, 5), 5)),
+    ?assertEqual(a, nth(IL1, 5)),
+    ?assertEqual(2, nth(IL2, 5)),
+    ?assertMatch({[1, 2, 3, 1], _}, split(IL2, 4)),
+    ?assertEqual([3, 1, 2], sublist(IL2, 3, 3)),
     ok.
 
 %---------------------------------------------------------------------------------------------------

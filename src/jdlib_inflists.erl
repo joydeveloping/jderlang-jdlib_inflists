@@ -9,8 +9,8 @@
 % Export.
 -export([iterate/3, iterate/2,
          repeat/1, cycle/1, seq/2, seq/1, geometric_series/2,
-         head/1, tail/1,
-         take/2, drop/2]).
+         head/1, tail/1, ht/1,
+         take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -34,8 +34,10 @@
 % Infinite lists constructors.
 %---------------------------------------------------------------------------------------------------
 
--spec iterate(H :: term(), Acc :: term(), F) -> inflist()
-      when F :: fun((term(), term()) -> {term(), term()}).
+-spec iterate(H, Acc, F) -> inflist()
+      when F :: fun((H, Acc) -> {H, Acc}),
+           H :: term(),
+           Acc :: term().
 %% @doc
 %% Create infinite list with head, accumulator and iterate function.
 iterate(H, Acc, F) when is_function(F, 2) ->
@@ -50,7 +52,8 @@ iterate(_, _, F) ->
 
 %---------------------------------------------------------------------------------------------------
 
--spec iterate(H :: term(), F :: fun((term()) -> term())) -> inflist().
+-spec iterate(H, F :: fun((H) -> H)) -> inflist()
+      when H :: term().
 %% @doc
 %% Create infinite list with head and iterate function.
 iterate(H, F) when is_function(F, 1) ->
@@ -158,13 +161,24 @@ tail(#inflist{h = H, acc = Acc, f = F} = IL) ->
 
 %---------------------------------------------------------------------------------------------------
 
+-spec ht(IL :: inflist()) -> {term(), inflist()}.
+%% @doc
+%% Take head and tail simultaneously.
+ht(IL) ->
+    {head(IL), tail(IL)}.
+
+%---------------------------------------------------------------------------------------------------
+
 -spec take(IL :: inflist(), N :: integer()) -> list().
 %% @doc
 %% Take first elements of infinite list.
+take(_, N) when (N < 0) ->
+    throw({badarg, N});
 take(IL, N) ->
     take(IL, N, []).
 
--spec take(IL :: inflist(), N :: integer(), R :: list()) -> list().
+-spec take(IL :: inflist(), N :: integer(), [E]) -> [E]
+      when E :: term().
 %% @private
 %% @doc
 %% Take first elements of infinite list.
@@ -175,13 +189,67 @@ take(IL, N, R) ->
 
 %---------------------------------------------------------------------------------------------------
 
+-spec nth(IL :: inflist(), N :: integer()) -> term().
+%% @doc
+nth(_, N) when (N < 0) ->
+    throw({badarg, N});
+nth(IL, N) ->
+    lists:last(take(IL, N)).
+
+%---------------------------------------------------------------------------------------------------
+
 -spec drop(IL :: inflist(), N :: integer()) -> inflist().
 %% @doc
 %% Drop first elements of infinite list.
+drop(_, N) when (N < 0) ->
+    throw({badarg, N});
 drop(IL, 0) ->
     IL;
 drop(IL, N) ->
     drop(tail(IL), N - 1).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec nthtail(IL :: inflist(), N :: integer()) -> inflist().
+%% @doc
+%% Tail of infinite list without n elements.
+nthtail(IL, N) ->
+    drop(IL, N).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec sublist(IL :: inflist(), N :: integer()) -> list().
+%% @doc
+%% Sublist from first position.
+sublist(IL, N) ->
+    take(IL, N).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec sublist(IL :: inflist(), Start :: integer(), N :: integer()) -> list().
+%% @doc
+%% Sublist from given position.
+sublist(IL, Start, N) ->
+    take(drop(IL, Start - 1), N).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec split(IL :: inflist(), N :: integer()) -> {list(), inflist()}.
+%% @doc
+%% Split infinite list by position.
+split(_, N) when (N < 0) ->
+    throw({badarg, N});
+split(IL, N) ->
+    split(IL, N, []).
+
+-spec split(IL :: inflist(), N :: integer(), [E]) -> {[E], inflist()}
+      when E :: term().
+%% @doc
+%% Split infinite list by position.
+split(IL, 0, R) ->
+    {lists:reverse(R), IL};
+split(IL, N, R) ->
+    split(tail(IL), N - 1, [head(IL) | R]).
 
 %---------------------------------------------------------------------------------------------------
 
