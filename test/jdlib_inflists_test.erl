@@ -16,7 +16,8 @@
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2,
-         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2]).
+         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2,
+         sparse/2, merge/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Tests.
@@ -149,6 +150,34 @@ math_test() ->
     ?assertThrow({badarg, _}, mul(1, 2)),
     ?assertEqual([2.0, 3.0, 4.0], take(sqrt(square(IL1)), 3)),
     ?assertEqual([1.0, 8.0, 27.0, 64.0, 125.0], take(pow(seq(1), 3), 5)),
+    ok.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec sparse_test() -> ok.
+%% @doc
+%% Function sparse test.
+sparse_test() ->
+    IL1 = seq(1),
+    IL2 = sparse(IL1, 0),
+    IL3 = sparse(IL1, 1),
+    IL4 = sparse(IL1, 2),
+    ?assertThrow({badarg, _}, sparse(IL1, -1)),
+    ?assertEqual([1, 2, 3], take(IL2, 3)),
+    ?assertEqual([1, 3, 5], take(IL3, 3)),
+    ?assertEqual([1, 4, 7], take(IL4, 3)),
+    ok.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec merge_test() -> ok.
+%% @doc
+%% Function merge test.
+merge_test() ->
+    IL1 = seq(1),
+    IL2 = cycle([a, b, c]),
+    IL3 = merge(IL1, IL2),
+    ?assertEqual([1, a, 2, b, 3, c, 4, a], take(IL3, 8)),
     ok.
 
 %---------------------------------------------------------------------------------------------------

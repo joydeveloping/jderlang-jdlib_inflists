@@ -13,7 +13,8 @@
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2,
-         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2]).
+         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2,
+         sparse/2, merge/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -520,6 +521,63 @@ sqrt(IL) ->
 %% Power of infinite list.
 pow(IL, P) ->
     map(IL, fun(X) -> math:pow(X, P) end).
+
+%---------------------------------------------------------------------------------------------------
+% Other functions.
+%---------------------------------------------------------------------------------------------------
+
+-spec sparse(IL :: inflist(), N :: integer()) -> inflist().
+%% @doc
+%% Take sparse infinite list (first element, and then every (N + 1)-th).
+%% For example:
+%% sparse(IL, 0) = IL
+%% sparse([E1, E2, E3, ...], 1) = [E1, E3, E5, ...]
+%% sparse([E1, E2, E3, ...], 2) = [E1, E4, E7, ...]
+sparse(IL, 0) when is_record(IL, inflist) ->
+    IL;
+sparse(#inflist{h = H, acc = Acc, f = F}, N) when (is_integer(N) andalso (N > 0)) ->
+    iterate
+    (
+        H,
+        Acc,
+        fun(Cur_H, Cur_Acc) ->
+            FN =
+                fun
+                    Loc_FN(Loc_H, Loc_Acc, 0) ->
+                        {Loc_H, Loc_Acc};
+                    Loc_FN(Loc_H, Loc_Acc, Loc_N) ->
+                        {New_H, New_Acc} = F(Loc_H, Loc_Acc),
+                        Loc_FN(New_H, New_Acc, Loc_N - 1)
+                end,
+            FN(Cur_H, Cur_Acc, N + 1)
+        end
+    );
+sparse(IL, N) ->
+    throw({badarg, {IL, N}}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec merge(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
+%% @doc
+%% Merge two infinite lists.
+merge(#inflist{h = H1, acc = Acc1, f = F1}, #inflist{h = H2, acc = Acc2, f = F2}) ->
+    iterate
+    (
+        H1,
+        {{H2, Acc2}, F1(H1, Acc1), false},
+        fun(_, {{Cur_H, Cur_Acc}, Next, Is_F1}) ->
+            {
+                Cur_H,
+                {
+                    Next,
+                    (if Is_F1 -> F1; true -> F2 end)(Cur_H, Cur_Acc),
+                    not Is_F1
+                }
+            }
+        end
+    );
+merge(IL1, IL2) ->
+    throw({badarg, {IL1, IL2}}).
 
 %---------------------------------------------------------------------------------------------------
 
