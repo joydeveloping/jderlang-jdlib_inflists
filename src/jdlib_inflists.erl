@@ -12,7 +12,7 @@
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
-         map/2, adj_pairs_map/2,
+         map/2, adj_pairs_map/2, mapfold/3,
          add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2,
          sparse/2, merge/2]).
 
@@ -415,6 +415,26 @@ map(IL, Map_F) ->
 %% Apply map function to every pair of adjacent elements.
 adj_pairs_map(IL, Map_F) ->
     zipwith(IL, tail(IL), Map_F).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec mapfold(IL :: inflist(), Fold_F :: fun((term(), Fold_Acc) -> Fold_Acc), Fold_Acc) -> inflist()
+      when Fold_Acc :: term().
+%% @doc
+%% Fold infinite list with saving accumulators.
+%% Note. We will never reach fold result because list is infinite.
+mapfold(#inflist{h = H, acc = Acc, f = F}, Fold_F, Fold_Acc) when is_function(Fold_F, 2) ->
+    iterate
+    (
+        Fold_F(H, Fold_Acc),
+        {H, Acc},
+        fun(Cur_Fold_Acc, {Cur_H, Cur_Acc}) ->
+            {New_H, New_Acc} = F(Cur_H, Cur_Acc),
+            {Fold_F(New_H, Cur_Fold_Acc), {New_H, New_Acc}}
+        end
+    );
+mapfold(IL, Fold_F, Fold_Acc) ->
+    throw({badarg, {IL, Fold_F, Fold_Acc}}).
 
 %---------------------------------------------------------------------------------------------------
 % Mathematical functions.
