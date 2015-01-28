@@ -13,7 +13,7 @@
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3,
-         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2,
+         add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
          sparse/2, merge/2]).
 
 %---------------------------------------------------------------------------------------------------
@@ -480,6 +480,14 @@ sub(A, B) ->
 
 %---------------------------------------------------------------------------------------------------
 
+-spec neg(IL :: inflist()) -> inflist().
+%% @doc
+%% Negate infinite list.
+neg(IL) ->
+    map(IL, fun(X) -> -X end).
+
+%---------------------------------------------------------------------------------------------------
+
 -spec mul(Arg, Arg) -> inflist()
       when Arg :: inflist() | term().
 %% @doc
@@ -520,6 +528,14 @@ dvs(A, B) ->
 
 %---------------------------------------------------------------------------------------------------
 
+-spec inv(IL :: inflist()) -> inflist().
+%% @doc
+%% Invert list.
+inv(IL) ->
+    map(IL, fun(X) -> 1 / X end).
+
+%---------------------------------------------------------------------------------------------------
+
 -spec square(IL :: inflist()) -> inflist().
 %% @doc
 %% Infinite list of squares.
@@ -541,6 +557,24 @@ sqrt(IL) ->
 %% Power of infinite list.
 pow(IL, P) ->
     map(IL, fun(X) -> math:pow(X, P) end).
+
+%---------------------------------------------------------------------------------------------------
+% Partial sums and products of infinite list.
+%---------------------------------------------------------------------------------------------------
+
+-spec sum(IL :: inflist()) -> inflist().
+%% @doc
+%% Partial sums.
+sum(IL) ->
+    mapfold(IL, fun(X, Y) -> X + Y end, 0).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec product(IL :: inflist()) -> inflist().
+%% @doc
+%% Partial products.
+product(IL) ->
+    mapfold(IL, fun(X, Y) -> X * Y end, 1).
 
 %---------------------------------------------------------------------------------------------------
 % Other functions.

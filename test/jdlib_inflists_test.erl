@@ -16,7 +16,7 @@
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3, mapfold_1/2,
-         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2,
+         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2, sum/1, product/1,
          sparse/2, merge/2]).
 
 %---------------------------------------------------------------------------------------------------
@@ -126,6 +126,8 @@ map_test() ->
     ?assertEqual([7, 9, 11], sublist(IL6, 3, 3)),
     IL7 = adj_pairs_map(IL5, fun(X, Y) -> Y - X end),
     ?assertEqual([1, 1, 1, 1, 1], sublist(IL7, 5, 5)),
+    ?assertEqual([1, 3, 6, 10, 15], take(sum(seq(1)), 5)),
+    ?assertEqual([1, 2, 6, 24, 120], take(product(seq(1)), 5)),
     ok.
 
 %---------------------------------------------------------------------------------------------------
