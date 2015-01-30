@@ -8,13 +8,13 @@
 
 % Export.
 -export([iterate/3, iterate/2,
-         repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, geometric_series/2,
+         repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, geometric_series/2, fib/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3,
          add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
-         sparse/2, odds/1, evens/1, merge/2]).
+         sparse/2, odds/1, evens/1, merge/2, sign_alternate/1, avg/1]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -165,6 +165,21 @@ geometric_series(Base, K) ->
         Base,
         fun(H) ->
             H * K
+        end
+    ).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec fib() -> inflist().
+%% @doc
+%% Fibonacci numbers.
+fib() ->
+    iterate
+    (
+        1,
+        0,
+        fun(H, Acc) ->
+            {H + Acc, H}
         end
     ).
 
@@ -672,6 +687,23 @@ merge(#inflist{h = H1, acc = Acc1, f = F1}, #inflist{h = H2, acc = Acc2, f = F2}
     );
 merge(IL1, IL2) ->
     throw({badarg, {IL1, IL2}}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec sign_alternate(IL :: inflist()) -> inflist().
+%% @doc
+%% Alternate sign of infinite list.
+%% Odd position elements are unchanged, even position elements are negated.
+sign_alternate(IL) ->
+    mul(IL, cycle([1, -1])).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec avg(IL :: inflist()) -> inflist().
+%% @doc
+%% Average values infinite list.
+avg(IL) ->
+    dvs(sum(IL), naturals()).
 
 %---------------------------------------------------------------------------------------------------
 
