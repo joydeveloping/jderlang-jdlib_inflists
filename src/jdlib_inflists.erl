@@ -8,7 +8,8 @@
 
 % Export.
 -export([iterate/3, iterate/2,
-         repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, geometric_series/2, fib/0,
+         repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, geometric_series/2,
+         fib/0, harmonic_series/0, anharmonic_series/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
@@ -182,6 +183,22 @@ fib() ->
             {H + Acc, H}
         end
     ).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec harmonic_series() -> inflist().
+%% @doc
+%% Harmonic series.
+harmonic_series() ->
+    inv(naturals()).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec anharmonic_series() -> inflist().
+%% @doc
+%% Anharmonic series (Leibniz series).
+anharmonic_series() ->
+    sign_alternate(inv(odds())).
 
 %---------------------------------------------------------------------------------------------------
 % Take elements.
