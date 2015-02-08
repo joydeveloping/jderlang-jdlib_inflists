@@ -8,7 +8,8 @@
 
 % Export.
 -export([iterate/3, iterate/2,
-         repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, geometric_series/2,
+         repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, naturals/1,
+         geometric_series/2,
          fib/0, harmonic_series/0, anharmonic_series/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
@@ -154,6 +155,14 @@ seq(From) ->
 %% Infinite list of natural numbers.
 naturals() ->
     seq(1).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec naturals(From :: integer()) -> inflist().
+%% @doc
+%% Naturals from given number.
+naturals(From) ->
+    seq(From).
 
 %---------------------------------------------------------------------------------------------------
 
