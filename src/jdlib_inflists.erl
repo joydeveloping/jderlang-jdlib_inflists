@@ -10,12 +10,13 @@
 -export([iterate/3, iterate/2,
          repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, naturals/1,
          geometric_series/2,
-         fib/0, harmonic_series/0, anharmonic_series/0,
+         fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3,
          add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
+         dirichlet_series/1, dirichlet_series/2,
          sparse/2, odds/1, evens/1, merge/2, sign_alternate/1, avg/1]).
 
 %---------------------------------------------------------------------------------------------------
@@ -208,6 +209,14 @@ harmonic_series() ->
 %% Anharmonic series (Leibniz series).
 anharmonic_series() ->
     sign_alternate(inv(odds())).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec grundy_series() -> inflist().
+%% @doc
+%% Grundy series (see Patrick Carmelo Grundy).
+grundy_series() ->
+    cycle([1, -1]).
 
 %---------------------------------------------------------------------------------------------------
 % Take elements.
@@ -642,6 +651,22 @@ product(IL) ->
     mapfold(IL, fun(X, Y) -> X * Y end, 1).
 
 %---------------------------------------------------------------------------------------------------
+
+-spec dirichlet_series(S :: number()) -> inflist().
+%% @doc
+%% Dirichlet series sum 1 / n^s.
+dirichlet_series(S) ->
+    pow(harmonic_series(), S).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec dirichlet_series(IL :: inflist(), S :: number()) -> inflist().
+%% @doc
+%% Dirichlet series of base inflist IL and pow degree S.
+dirichlet_series(IL, S) ->
+    mul(IL, dirichlet_series(S)).
+
+%---------------------------------------------------------------------------------------------------
 % Other functions.
 %---------------------------------------------------------------------------------------------------
 
@@ -721,7 +746,7 @@ merge(IL1, IL2) ->
 %% Alternate sign of infinite list.
 %% Odd position elements are unchanged, even position elements are negated.
 sign_alternate(IL) ->
-    mul(IL, cycle([1, -1])).
+    mul(IL, grundy_series()).
 
 %---------------------------------------------------------------------------------------------------
 

@@ -11,13 +11,17 @@
 
 % Functions import.
 -import(jdlib_inflists,
-        [repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, geometric_series/2, fib/0,
+        [iterate/3, iterate/2,
+         repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, naturals/1,
+         geometric_series/2,
+         fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
-         map/2, adj_pairs_map/2, mapfold/3, mapfold_1/2,
-         add/2, sub/2, mul/2, dvs/2, square/1, sqrt/1, pow/2, sum/1, product/1,
-         sparse/2, odds/1, evens/1, merge/2, sign_alternate/1]).
+         map/2, adj_pairs_map/2, mapfold/3,
+         add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
+         dirichlet_series/1, dirichlet_series/2,
+         sparse/2, odds/1, evens/1, merge/2, sign_alternate/1, avg/1]).
 
 %---------------------------------------------------------------------------------------------------
 % Tests.
@@ -206,6 +210,7 @@ merge_test() ->
 other_test() ->
     ?assertEqual([1, -2, 3, -4, 5], take(sign_alternate(naturals()), 5)),
     ?assertEqual([1, 1, 2, 3, 5, 8, 13], take(fib(), 7)),
+    ?assertEqual([1, -1, 1, -1], take(grundy_series(), 4)),
     ok.
 
 %---------------------------------------------------------------------------------------------------
