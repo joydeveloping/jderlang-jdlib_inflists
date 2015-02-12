@@ -9,15 +9,16 @@
 % Export.
 -export([iterate/3, iterate/2,
          repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, naturals/1,
-         geometric_series/2,
-         fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0,
+         geometric_series/2, power_series/1,
+         fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0, facts/0, inv_facts/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3,
          add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
          dirichlet_series/1, dirichlet_series/2,
-         sparse/2, odds/1, evens/1, merge/2, sign_alternate/1, avg/1]).
+         sparse/2, odds/1, evens/1, merge/2, unmerge/1, sign_alternate/1, avg/1,
+         taylor_exp/1, taylor_sin/1, taylor_cos/1]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -181,6 +182,14 @@ geometric_series(Base, K) ->
 
 %---------------------------------------------------------------------------------------------------
 
+-spec power_series(X :: number()) -> inflist().
+%% @doc
+%% Series of number powers.
+power_series(X) ->
+    geometric_series(1, X).
+
+%---------------------------------------------------------------------------------------------------
+
 -spec fib() -> inflist().
 %% @doc
 %% Fibonacci numbers.
@@ -217,6 +226,30 @@ anharmonic_series() ->
 %% Grundy series (see Patrick Carmelo Grundy).
 grundy_series() ->
     cycle([1, -1]).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec facts() -> inflist().
+%% @doc
+%% Factorials series (starts with 0! = 1).
+facts() ->
+    iterate
+    (
+        1,
+        1,
+        fun(H, Acc) ->
+            M = H * Acc,
+            {M, M + 1}
+        end
+    ).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec inv_facts() -> inflist().
+%% @doc
+%% Series of inverted factorials.
+inv_facts() ->
+    inv(facts()).
 
 %---------------------------------------------------------------------------------------------------
 % Take elements.
@@ -741,6 +774,14 @@ merge(IL1, IL2) ->
 
 %---------------------------------------------------------------------------------------------------
 
+-spec unmerge(IL :: inflist()) -> {inflist(), inflist()}.
+%% @doc
+%% Split infinite list to odd and even elements infinite lists.
+unmerge(IL) ->
+    {odds(IL), evens(IL)}.
+
+%---------------------------------------------------------------------------------------------------
+
 -spec sign_alternate(IL :: inflist()) -> inflist().
 %% @doc
 %% Alternate sign of infinite list.
@@ -755,6 +796,29 @@ sign_alternate(IL) ->
 %% Average values infinite list.
 avg(IL) ->
     dvs(sum(IL), naturals()).
+
+%---------------------------------------------------------------------------------------------------
+% Taylor series.
+%---------------------------------------------------------------------------------------------------
+
+-spec taylor_exp(X :: number()) -> inflist().
+%% @doc
+taylor_exp(X) ->
+    dvs(power_series(X), facts()).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec taylor_sin(X :: number()) -> inflist().
+%% @doc
+taylor_sin(X) ->
+    sign_alternate(evens(taylor_exp(X))).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec taylor_cos(X :: number()) -> inflist().
+%% @doc
+taylor_cos(X) ->
+    sign_alternate(odds(taylor_exp(X))).
 
 %---------------------------------------------------------------------------------------------------
 

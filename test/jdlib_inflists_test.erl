@@ -13,15 +13,16 @@
 -import(jdlib_inflists,
         [iterate/3, iterate/2,
          repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, naturals/1,
-         geometric_series/2,
-         fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0,
+         geometric_series/2, power_series/1,
+         fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0, facts/0, inv_facts/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3,
          add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
          dirichlet_series/1, dirichlet_series/2,
-         sparse/2, odds/1, evens/1, merge/2, sign_alternate/1, avg/1]).
+         sparse/2, odds/1, evens/1, merge/2, unmerge/1, sign_alternate/1, avg/1,
+         taylor_exp/1, taylor_sin/1, taylor_cos/1]).
 
 %---------------------------------------------------------------------------------------------------
 % Tests.
@@ -200,6 +201,21 @@ merge_test() ->
     IL2 = cycle([a, b, c]),
     IL3 = merge(IL1, IL2),
     ?assertEqual([1, a, 2, b, 3, c, 4, a], take(IL3, 8)),
+    {IL4, IL5} = unmerge(IL1),
+    ?assertEqual([1, 3, 5], take(IL4, 3)),
+    ?assertEqual([2, 4, 6], take(IL5, 3)),
+    ok.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec taylor_test() -> ok.
+%% @doc
+%% Some taylor series tests.
+taylor_test() ->
+    V = 0.12345,
+    ?assert((lists:sum(take(taylor_exp(V), 5)) - math:exp(V)) < 0.001),
+    ?assert((lists:sum(take(taylor_sin(V), 5)) - math:sin(V)) < 0.001),
+    ?assert((lists:sum(take(taylor_cos(V), 5)) - math:cos(V)) < 0.001),
     ok.
 
 %---------------------------------------------------------------------------------------------------
