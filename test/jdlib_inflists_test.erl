@@ -17,6 +17,7 @@
          fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0, facts/0, inv_facts/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
+         attach_list/2, attach/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3,
          add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
@@ -91,6 +92,20 @@ take_drop_test() ->
     ?assertEqual(2, nth(IL2, 5)),
     ?assertMatch({[1, 2, 3, 1], _}, split(IL2, 4)),
     ?assertEqual([3, 1, 2], sublist(IL2, 3, 3)),
+    ok.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec attach_test() -> ok.
+%% @doc
+%% Function attach test.
+attach_test() ->
+    IL = naturals(),
+    ?assertThrow({badarg, _}, attach_list(IL, 5)),
+    ?assertThrow({badarg, _}, attach_list(0, [1, 2, 3])),
+    ?assertEqual([a, b, c, 1, 2, 3], take(attach_list(IL, [a, b, c]), 6)),
+    ?assertThrow({badarg, _}, attach(0, 1)),
+    ?assertEqual([a, 1, 2, 3], take(attach(IL, a), 4)),
     ok.
 
 %---------------------------------------------------------------------------------------------------

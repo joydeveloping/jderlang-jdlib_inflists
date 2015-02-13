@@ -13,6 +13,7 @@
          fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0, facts/0, inv_facts/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
+         attach_list/2, attach/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3,
          add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
@@ -252,7 +253,7 @@ inv_facts() ->
     inv(facts()).
 
 %---------------------------------------------------------------------------------------------------
-% Take elements.
+% Take and attach elements.
 %---------------------------------------------------------------------------------------------------
 
 -spec head(IL :: inflist()) -> term().
@@ -361,6 +362,42 @@ split(IL, 0, R) ->
     {lists:reverse(R), IL};
 split(IL, N, R) ->
     split(tail(IL), N - 1, [head(IL) | R]).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec attach_list(IL :: inflist(), L :: list()) -> inflist().
+%% @doc
+%% Attach list to infinite list from the beginning.
+attach_list(IL, []) when is_record(IL, inflist) ->
+    IL;
+attach_list(#inflist{h = H, acc = Acc, f = F}, [LH | LT]) ->
+    iterate
+    (
+        LH,
+        {false, LT},
+        fun
+            (_, {false, Cur_L}) ->
+                case Cur_L of
+                    [Cur_LH | Cur_LT] ->
+                        {Cur_LH, {false, Cur_LT}};
+                    [] ->
+                        {H, {true, Acc}}
+                end;
+            (Cur_H, {true, Cur_Acc}) ->
+                {New_H, New_Acc} = F(Cur_H, Cur_Acc),
+                {New_H, {true, New_Acc}}
+        end
+    );
+attach_list(IL, L) ->
+    throw({badarg, {IL, L}}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec attach(IL :: inflist(), T :: term()) -> inflist().
+%% @doc
+%% Attach new element as infinte list head.
+attach(IL, T) ->
+    attach_list(IL, [T]).
 
 %---------------------------------------------------------------------------------------------------
 % Zip/unzip functions and functors.
