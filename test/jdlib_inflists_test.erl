@@ -22,7 +22,7 @@
          add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
          dirichlet_series/1, dirichlet_series/2,
          sparse/2, odds/1, evens/1, merge/2, unmerge/1, sign_alternate/1, avg/1,
-         taylor_exp/1, taylor_sin/1, taylor_cos/1]).
+         taylor_exp/1, taylor_lnxp1/1, taylor_sin/1, taylor_cos/1, taylor_arctg/1]).
 
 %---------------------------------------------------------------------------------------------------
 % Tests.
@@ -214,8 +214,12 @@ merge_test() ->
 taylor_test() ->
     V = 0.12345,
     ?assert((lists:sum(take(taylor_exp(V), 5)) - math:exp(V)) < 0.001),
+    ?assertThrow({badarg, _}, taylor_lnxp1(2)),
+    ?assert((lists:sum(take(taylor_lnxp1(V), 10)) - math:log(V + 1)) < 0.001),
     ?assert((lists:sum(take(taylor_sin(V), 5)) - math:sin(V)) < 0.001),
     ?assert((lists:sum(take(taylor_cos(V), 5)) - math:cos(V)) < 0.001),
+    ?assertThrow({badarg, _}, taylor_arctg(2)),
+    ?assert((lists:sum(take(taylor_arctg(V), 10)) - math:atan(V)) < 0.001),
     ok.
 
 %---------------------------------------------------------------------------------------------------

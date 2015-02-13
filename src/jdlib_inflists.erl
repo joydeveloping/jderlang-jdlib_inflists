@@ -18,7 +18,7 @@
          add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
          dirichlet_series/1, dirichlet_series/2,
          sparse/2, odds/1, evens/1, merge/2, unmerge/1, sign_alternate/1, avg/1,
-         taylor_exp/1, taylor_sin/1, taylor_cos/1]).
+         taylor_exp/1, taylor_lnxp1/1, taylor_sin/1, taylor_cos/1, taylor_arctg/1]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -803,13 +803,40 @@ avg(IL) ->
 
 -spec taylor_exp(X :: number()) -> inflist().
 %% @doc
+%% Taylor series of e^x for -inf < x < inf.
+%% <pre>
+%%           x    x^2   x^3
+%% e^x = 1 + -  + --- + --- + ...
+%%           1!    2!    3!
+%% </pre>
 taylor_exp(X) ->
     dvs(power_series(X), facts()).
 
 %---------------------------------------------------------------------------------------------------
 
+-spec taylor_lnxp1(X :: number()) -> inflist().
+%% @doc
+%% Taylor series of ln(1 + x) for -1 < x <= 1.
+%% <pre>
+%%                 x^2   x^3
+%% ln(x + 1) = x - --- + --- - ...
+%%                  2     3
+%% </pre>
+taylor_lnxp1(X) when ((X =< -1) orelse (X > 1)) ->
+    throw({badarg, X});
+taylor_lnxp1(X) ->
+    sign_alternate(dvs(tail(power_series(X)), naturals())).
+
+%---------------------------------------------------------------------------------------------------
+
 -spec taylor_sin(X :: number()) -> inflist().
 %% @doc
+%% Taylor series of sin(x) for -inf < x < inf.
+%% <pre>
+%%              x^3   x^5
+%% sin(x) = x - --- + --- - ...
+%%               3!    5!
+%% </pre>
 taylor_sin(X) ->
     sign_alternate(evens(taylor_exp(X))).
 
@@ -817,8 +844,29 @@ taylor_sin(X) ->
 
 -spec taylor_cos(X :: number()) -> inflist().
 %% @doc
+%% Taylor series of cos(x) for -inf < x < inf.
+%% <pre>
+%%              x^2   x^4
+%% cos(x) = 1 - --- + --- - ...
+%%               2!    4!
+%% </pre>
 taylor_cos(X) ->
     sign_alternate(odds(taylor_exp(X))).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec taylor_arctg(X :: number()) -> inflist().
+%% @doc
+%% Taylor series of arctg(x) for -1 < x < 1.
+%% <pre>
+%%                x^3   x^5
+%% arctg(x) = x - --- + --- - ...
+%%                 3     5
+%% </pre>
+taylor_arctg(X) when (abs(X) >= 1) ->
+    throw({badarg, X});
+taylor_arctg(X) ->
+    sign_alternate(dvs(evens(power_series(X)), naturals())).
 
 %---------------------------------------------------------------------------------------------------
 
