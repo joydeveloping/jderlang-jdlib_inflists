@@ -1,7 +1,7 @@
 %% @doc
 %% Tests for jdlib_inflists.
 %%
-%% Copyright Joy Developing.
+%% @author Alexey Rybakov
 
 % Module name.
 -module(jdlib_inflists_test).

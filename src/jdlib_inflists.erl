@@ -1,7 +1,7 @@
 %% @doc
 %% Infinite lists realization.
 %%
-%% Copyright Joy Developing.
+%% @author Alexey Rybakov
 
 % Module name.
 -module(jdlib_inflists).
@@ -840,7 +840,7 @@ avg(IL) ->
 
 -spec taylor_exp(X :: number()) -> inflist().
 %% @doc
-%% Taylor series of e^x for -inf < x < inf.
+%% Taylor series of e^x for (-inf, inf).
 %% <pre>
 %%           x    x^2   x^3
 %% e^x = 1 + -  + --- + --- + ...
@@ -853,7 +853,7 @@ taylor_exp(X) ->
 
 -spec taylor_lnxp1(X :: number()) -> inflist().
 %% @doc
-%% Taylor series of ln(1 + x) for -1 < x <= 1.
+%% Taylor series of ln(1 + x) for (-1, 1].
 %% <pre>
 %%                 x^2   x^3
 %% ln(x + 1) = x - --- + --- - ...
@@ -868,7 +868,7 @@ taylor_lnxp1(X) ->
 
 -spec taylor_sin(X :: number()) -> inflist().
 %% @doc
-%% Taylor series of sin(x) for -inf < x < inf.
+%% Taylor series of sin(x) for (-inf, inf).
 %% <pre>
 %%              x^3   x^5
 %% sin(x) = x - --- + --- - ...
@@ -881,7 +881,7 @@ taylor_sin(X) ->
 
 -spec taylor_cos(X :: number()) -> inflist().
 %% @doc
-%% Taylor series of cos(x) for -inf < x < inf.
+%% Taylor series of cos(x) for (-inf, inf).
 %% <pre>
 %%              x^2   x^4
 %% cos(x) = 1 - --- + --- - ...
@@ -894,7 +894,7 @@ taylor_cos(X) ->
 
 -spec taylor_arctg(X :: number()) -> inflist().
 %% @doc
-%% Taylor series of arctg(x) for -1 < x < 1.
+%% Taylor series of arctg(x) for (-1, 1).
 %% <pre>
 %%                x^3   x^5
 %% arctg(x) = x - --- + --- - ...
