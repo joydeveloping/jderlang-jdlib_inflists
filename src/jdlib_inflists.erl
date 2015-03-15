@@ -15,7 +15,7 @@
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          attach_list/2, attach/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
-         map/2, adj_pairs_map/2, mapfold/3,
+         map/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
          add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
          dirichlet_series/1, dirichlet_series/2,
          sparse/2, odds/1, evens/1, merge/2, unmerge/1, sign_alternate/1, avg/1,
@@ -579,6 +579,38 @@ mapfold(#inflist{h = H, acc = Acc, f = F}, Fold_F, Fold_Acc) when is_function(Fo
     );
 mapfold(IL, Fold_F, Fold_Acc) ->
     throw({badarg, {IL, Fold_F, Fold_Acc}}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec is_all(IL :: inflist(), Pred :: fun((term()) -> boolean()), N :: integer()) -> boolean().
+%% @doc
+%% Check predicate for all of N first infinite list members.
+is_all(_, _, 0) ->
+    true;
+is_all(IL, Pred, N) when (N > 0) ->
+    Is = Pred(head(IL)),
+    if
+        not Is ->
+            false;
+        true ->
+            is_all(tail(IL), Pred, N - 1)
+    end.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec is_any(IL :: inflist(), Pred :: fun((term()) -> boolean()), N :: integer()) -> boolean().
+%% @doc
+%% Check predicate for any of N first infinite list members.
+is_any(_, _, 0) ->
+         false;
+is_any(IL, Pred, N) when (N > 0) ->
+    Is = Pred(head(IL)),
+    if
+        Is ->
+            true;
+        true ->
+            is_any(tail(IL), Pred, N - 1)
+    end.
 
 %---------------------------------------------------------------------------------------------------
 % Mathematical functions.
