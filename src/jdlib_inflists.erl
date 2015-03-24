@@ -240,7 +240,7 @@ facts() ->
         1,
         fun(H, Acc) ->
             M = H * Acc,
-            {M, M + 1}
+            {M, Acc + 1}
         end
     ).
 
