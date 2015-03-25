@@ -76,3 +76,32 @@ facts()
 inv_facts()
 [1.0, 1.0, 0.5, 0.16666666666666666, ...]
 ```
+
+### Access to infinite lists parts
+
+`head/1`, `tail/1', `ht/1`, `take/1`, `nth/1`, `drop/1`, `nthtail/1`
+
+### Simple operations on single infinite list
+
+`sublist/2`, `sublist/3`, `split/2`, `attach_list/2`, `attach/2`
+
+### Zip and unzip functions
+
+`zip/2`, `zip_3/3`, `unzip/1`, `unzip_3`
+
+### Higher order functions on infinite lists
+
+`zipwith/3`, `map/2`, `adj_pairs_map/2`, `mapfold/2`, `is_all/3`, `is_any/3`
+
+### Mathematical functions
+
+`add/2`, `sub/2`, `neg/1`, `mul/2`, `dvs/2`, `inv/1`, `square/1`, `sqrt/1`, `pow/2`, `sum/1`, `product/1`, `avg/1`
+
+### Additional operations on infinite lists
+
+`sparse/2, `odds/1`, `evens/1`, `merge/2`, `unmerge/1`, `sign_alternate/1`
+
+### Taylor series
+
+`taylor_exp/1`, `taylor_lnxp1/1`, `taylor_sin/1`, `taylor_cos/1`, `taylor_arctg/1`
+
