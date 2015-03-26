@@ -79,10 +79,10 @@ inv_facts().
 
 ### Access to infinite lists parts
 
-Function `head/1` returns head of infinite list,  `tail/1' returns tail of infinite list, `ht/1` returns both of them in one time.
+Function `head/1` returns head of infinite list, `tail/1` returns tail of infinite list, `ht/1` returns both of them in one time.
 Function `take/2` is needed to get given number of infinite list elements from its beginning.
 Function `nth/2` returns element with given number.
-Function drop returns infinite list without first elements `drop/2` (`nthtail/2` is the same).
+Function `drop/2` returns infinite list without first elements (`nthtail/2` is the same).
 
 ```erlang
 N = naturals().
