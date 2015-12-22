@@ -12,13 +12,14 @@
          geometric_series/2, power_series/1,
          fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0, facts/0, inv_facts/0,
          squares/0, sqrts/0, cubes/0, triangulars/0,
+         primes/0, even_perfects/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          attach_list/2, attach/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
-         add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, cube/1, pow/2,
-         sum/1, product/1,
+         add/2, inc/1, sub/2, dec/1, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, cube/1,
+         pow/2, npow/2, pows/2, npows/2, sum/1, product/1,
          dirichlet_series/1, dirichlet_series/2,
          sparse/2, odds/1, evens/1, merge/2, unmerge/1, sign_alternate/1, avg/1,
          taylor_exp/1, taylor_lnxp1/1, taylor_sin/1, taylor_cos/1, taylor_arctg/1]).
@@ -292,6 +293,54 @@ triangulars() ->
             {H + Acc + 1, Acc + 1}
         end
     ).
+
+%---------------------------------------------------------------------------------------------------
+% Prime numbers.
+%---------------------------------------------------------------------------------------------------
+
+-spec primes() -> inflist().
+%% @doc
+%% Prime numbers.
+primes() ->
+    iterate
+    (
+        2,   % first prime number
+        [2], % list of factors
+
+        fun(H, Acc) ->
+
+            % Get next prime number function.
+            Next_P_Fun =
+                fun
+                    NPF_(N, [], _) ->
+                        N;
+                    NPF_(N, [P | _], _) when (P * P > N) ->
+                        N;
+                    NPF_(N, [P | T], Ps) ->
+                        if
+                            (N rem P) =:= 0 ->
+                                NPF_(N + 1, Ps, Ps);
+                            true ->
+                                NPF_(N, T, Ps)
+                        end
+                end,
+
+            P = Next_P_Fun(H + 1, Acc, Acc),
+            {P, Acc ++ [P]}
+        end
+    ).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec even_perfects() -> inflist().
+%% @doc
+%% Even perfect numbers.
+even_perfects() ->
+    P = primes(),
+    P1 = dec(P),
+    Pows1 = npows(2, P1),
+    Pows = mul(Pows1, 2),
+    mul(Pows1, dec(Pows)).
 
 %---------------------------------------------------------------------------------------------------
 % Take and attach elements.
@@ -677,6 +726,14 @@ add(A, B) ->
 
 %---------------------------------------------------------------------------------------------------
 
+-spec inc(IL :: inflist()) -> inflist().
+%% @doc
+%% Increment.
+inc(IL) ->
+    add(IL, 1).
+
+%---------------------------------------------------------------------------------------------------
+
 -spec sub(Arg, Arg) -> inflist()
       when Arg :: inflist() | term().
 %% @doc
@@ -694,6 +751,14 @@ sub(A, B) ->
         true ->
             throw({badarg, {A, B}})
     end.
+
+%---------------------------------------------------------------------------------------------------
+
+-spec dec(IL :: inflist()) -> inflist().
+%% @doc
+%% Decrement.
+dec(IL) ->
+    sub(IL, 1).
 
 %---------------------------------------------------------------------------------------------------
 
@@ -782,6 +847,45 @@ cube(IL) ->
 %% Power of infinite list.
 pow(IL, P) ->
     map(IL, fun(X) -> math:pow(X, P) end).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec npow(IL :: inflist(), P :: number()) -> inflist().
+%% @doc
+%% Power of infinite list.
+npow(IL, 1) ->
+    IL;
+npow(IL, P) when (P > 1) ->
+    mul(IL, npow(IL, P - 1)).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec pows(N :: number(), IL :: inflist()) -> inflist().
+%% @doc
+%% Return powers of given number (powers are taken from IL).
+pows(N, IL) ->
+    map(IL, fun(X) -> math:pow(N, X) end).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec npows(N :: number(), IL :: inflist()) -> inflist().
+%% @doc
+%% Return natural powers of given number (powers are taken from IL).
+npows(N, IL) ->
+    map
+    (
+        IL,
+        fun(P) ->
+            N_Pow =
+                fun
+                    NP_(N_, 1) ->
+                        N_;
+                    NP_(N_, P_) when (P_ > 1) ->
+                        N_ * NP_(N_, P_ - 1)
+                end,
+            N_Pow(N, P)
+        end
+    ).
 
 %---------------------------------------------------------------------------------------------------
 % Partial sums and products of infinite list.
