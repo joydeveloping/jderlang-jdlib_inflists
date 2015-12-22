@@ -11,12 +11,14 @@
          repeat/1, cycle/1, seq/2, odds/0, evens/0, seq/1, naturals/0, naturals/1,
          geometric_series/2, power_series/1,
          fib/0, harmonic_series/0, anharmonic_series/0, grundy_series/0, facts/0, inv_facts/0,
+         squares/0, sqrts/0, cubes/0, triangulars/0,
          head/1, tail/1, ht/1,
          take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
          attach_list/2, attach/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
-         add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, pow/2, sum/1, product/1,
+         add/2, sub/2, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, cube/1, pow/2,
+         sum/1, product/1,
          dirichlet_series/1, dirichlet_series/2,
          sparse/2, odds/1, evens/1, merge/2, unmerge/1, sign_alternate/1, avg/1,
          taylor_exp/1, taylor_lnxp1/1, taylor_sin/1, taylor_cos/1, taylor_arctg/1]).
@@ -251,6 +253,45 @@ facts() ->
 %% Series of inverted factorials.
 inv_facts() ->
     inv(facts()).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec squares() -> inflist().
+%% @doc
+%% Natural squares.
+squares() ->
+    square(naturals()).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec sqrts() -> inflist().
+%% @doc
+%% Square roots of naturals.
+sqrts() ->
+    sqrt(naturals()).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec cubes() -> inflist().
+%% @doc
+%% Natural cubes.
+cubes() ->
+    cube(naturals()).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec triangulars() -> inflist().
+%% @doc
+%% Triangulars numbers.
+triangulars() ->
+    iterate
+    (
+        1,
+        1,
+        fun(H, Acc) ->
+            {H + Acc + 1, Acc + 1}
+        end
+    ).
 
 %---------------------------------------------------------------------------------------------------
 % Take and attach elements.
@@ -725,6 +766,14 @@ square(IL) ->
 %% Square root of infinite list.
 sqrt(IL) ->
     map(IL, fun(X) -> math:sqrt(X) end).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec cube(IL :: inflist()) -> inflist().
+%% @doc
+%% Cobe of infinite list.
+cube(IL) ->
+    mul(square(IL), IL).
 
 %---------------------------------------------------------------------------------------------------
 
