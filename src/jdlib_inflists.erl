@@ -14,7 +14,7 @@
          squares/0, sqrts/0, cubes/0, triangulars/0,
          primes/0, even_perfects/0,
          head/1, tail/1, ht/1,
-         take/2, nth/2, drop/2, nthtail/2, sublist/2, sublist/3, split/2,
+         take/2, nth/2, drop/2, drop_less/2, nthtail/2, sublist/2, sublist/3, split/2,
          attach_list/2, attach/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
          map/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
@@ -22,7 +22,8 @@
          pow/2, npow/2, pows/2, npows/2, sum/1, product/1,
          dirichlet_series/1, dirichlet_series/2,
          sparse/2, odds/1, evens/1, merge/2, unmerge/1, sign_alternate/1, avg/1,
-         taylor_exp/1, taylor_lnxp1/1, taylor_sin/1, taylor_cos/1, taylor_arctg/1]).
+         taylor_exp/1, taylor_lnxp1/1, taylor_sin/1, taylor_cos/1, taylor_arctg/1,
+         mono_union/2, mono_intersection/2, mono_complement/2]).
 
 %---------------------------------------------------------------------------------------------------
 % Types.
@@ -409,6 +410,20 @@ drop(IL, 0) ->
     IL;
 drop(IL, N) ->
     drop(tail(IL), N - 1).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec drop_less(IL :: inflist(), N :: number()) -> inflist().
+%% @doc
+%% Drop first elements less than N.
+drop_less(IL, N) ->
+    {H, T} = ht(IL),
+    if
+        H < N ->
+            drop_less(T, N);
+        true ->
+            IL
+    end.
 
 %---------------------------------------------------------------------------------------------------
 
@@ -1089,6 +1104,86 @@ taylor_arctg(X) when (abs(X) >= 1) ->
     throw({badarg, X});
 taylor_arctg(X) ->
     sign_alternate(dvs(evens(power_series(X)), naturals())).
+
+%---------------------------------------------------------------------------------------------------
+% Sets operations.
+%---------------------------------------------------------------------------------------------------
+
+-spec mono_union(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
+%% @doc
+%% Union of two monotonous lists.
+mono_union(IL1, IL2) ->
+    IL =
+        iterate
+        (
+            0,
+            {IL1, IL2},
+            fun(_, {L1, L2}) ->
+                {H1, T1} = ht(L1),
+                {H2, T2} = ht(L2),
+                if
+                    H1 < H2 ->
+                        {H1, {T1, L2}};
+                    true ->
+                        {H2, {L1, T2}}
+                end
+            end
+        ),
+    tail(IL).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec mono_intersection(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
+%% @doc
+%% Union of two monotonous lists.
+mono_intersection(IL1, IL2) ->
+    IL =
+        iterate
+        (
+            0,
+            {IL1, IL2},
+            fun
+                F_(_, {L1, L2}) ->
+                    {H1, T1} = ht(L1),
+                    {H2, T2} = ht(L2),
+                    if
+                        H1 < H2 ->
+                            F_(none, {drop_less(L1, H2), L2});
+                        H1 > H2 ->
+                            F_(none, {L1, drop_less(L2, H1)});
+                        true ->
+                            {H1, {T1, T2}}
+                    end
+            end
+        ),
+    tail(IL).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec mono_complement(IL1 :: inflist(), IL2 :: inflist()) -> inflist().
+%% @doc
+%% Union of two monotonous lists.
+mono_complement(IL1, IL2) ->
+    IL =
+        iterate
+        (
+            0,
+            {IL1, IL2},
+            fun
+                F_(_, {L1, L2}) ->
+                    {H1, T1} = ht(L1),
+                    {H2, T2} = ht(L2),
+                    if
+                        H1 < H2 ->
+                            {H1, {T1, L2}};
+                        H1 > H2 ->
+                            F_(none, {L1, drop_less(L2, H1)});
+                        true ->
+                            F_(none, {T1, T2})
+                    end
+            end
+        ),
+    tail(IL).
 
 %---------------------------------------------------------------------------------------------------
 
