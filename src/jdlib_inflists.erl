@@ -17,7 +17,7 @@
          take/2, nth/2, drop/2, drop_less/2, nthtail/2, sublist/2, sublist/3, split/2,
          attach_list/2, attach/2,
          zip/2, zip_3/3, zipwith/3, unzip/1, unzip_3/1,
-         map/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
+         map/2, filter/2, adj_pairs_map/2, mapfold/3, is_all/3, is_any/3,
          add/2, inc/1, sub/2, dec/1, neg/1, mul/2, dvs/2, inv/1, square/1, sqrt/1, cube/1,
          pow/2, npow/2, pows/2, npows/2, sum/1, product/1,
          dirichlet_series/1, dirichlet_series/2,
@@ -656,6 +656,31 @@ map(#inflist{h = H, acc = Acc, f = F}, Map_F) when is_function(Map_F, 1) ->
     );
 map(IL, Map_F) ->
     throw({badarg, {IL, Map_F}}).
+
+%---------------------------------------------------------------------------------------------------
+
+-spec filter(IL :: inflist(), Filter_F :: fun((term()) -> boolean())) -> inflist().
+%% @doc
+%% Filter infinite list.
+filter(IL, Filter_F) ->
+    New_IL =
+        iterate
+        (
+            0,
+            IL,
+            fun
+                F_(_, L) ->
+                    {H, T} = ht(L),
+                    F_Res = Filter_F(H),
+                    if
+                        F_Res ->
+                            {H, T};
+                        true ->
+                            F_(none, T)
+                    end
+            end
+        ),
+    tail(New_IL).
 
 %---------------------------------------------------------------------------------------------------
 
